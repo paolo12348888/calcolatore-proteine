@@ -106,9 +106,9 @@ v1.innerHTML=`<p class="s">Confronta due geni: interazione diretta e partner in 
 const v2=document.createElement("div");v2.id="v2";v2.style.display="none";
 v2.innerHTML=`<p class="s">Incolla simboli genici (spazi, virgole o righe). Arricchimento con test ipergeometrico e correzione FDR (Benjamini-Hochberg); sfondo: tutti i geni della pagina.</p><textarea id="gl" rows="5" placeholder="TP53 MDM2 ATM CHEK2 BRCA1"></textarea><button class="bt" onclick="enr()">Analizza</button><div id="eo"></div>`;
 const tb=document.createElement("div");
-tb.innerHTML=`<div>${["Cerca","Confronta","Lista geni"].map((t,k)=>`<button class="tb" onclick="tab(${k})">${t}</button>`).join("")}</div><label class="s" style="display:block;margin-bottom:8px">Soglia STRING <select id="th" style="width:auto;display:inline-block;margin:0 6px;padding:6px" onchange="TH=+this.value;stat();list()">${[500,600,700,800,900].map(v=>`<option${v==700?" selected":""}>${v}</option>`).join("")}</select>più alta = meno partner, più affidabili</label>`;
+tb.innerHTML=`<div>${["Cerca","Confronta","Lista geni","Assembla"].map((t,k)=>`<button class="tb" onclick="tab(${k})">${t}</button>`).join("")}</div><label class="s" style="display:block;margin-bottom:8px">Soglia STRING <select id="th" style="width:auto;display:inline-block;margin:0 6px;padding:6px" onchange="TH=+this.value;stat();list()">${[500,600,700,800,900].map(v=>`<option${v==700?" selected":""}>${v}</option>`).join("")}</select>più alta = meno partner, più affidabili</label>`;
 $("st").after(tb);document.querySelector(".note").before(v0,v1,v2);
-function tab(k){[v0,v1,v2].forEach((v,j)=>v.style.display=j==k?"":"none");tb.querySelectorAll(".tb").forEach((b,j)=>b.classList.toggle("on",j==k))}
+function tab(k){[v0,v1,v2,va].forEach((v,j)=>{if(v)v.style.display=j==k?"":"none"});tb.querySelectorAll(".tb").forEach((b,j)=>b.classList.toggle("on",j==k));if(k==3)setTimeout(()=>{asFit();asDraw()},0)}
 tab(0);
 function csv(rows,name){const t=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");$("cx").value=t;$("cxw").style.display="block";try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+t],{type:"text/csv"}));a.download=name;a.click()}catch(e){}}
 function item(i){const x=D[i],so=$("so").value,m=so==="3"?x[14].length/2:so==="2"?PC[i]:x[11];return `<div class="it" onclick="det(${i})">${m>=0?`<span class="n">${m}</span>`:""}<b>${esc(x[0])}</b> · ${esc(x[3])}<small>${esc(C[x[5]])}</small></div>`}
@@ -143,7 +143,7 @@ function bgs(i){const x=D[i],p=x[14],n=p.length/2;let h=`<h2>Conferma sperimenta
 function det(i){tab(0);const x=D[i],n=x[11];
  $("out").innerHTML=`<div class="card"><b style="font-size:20px">${esc(x[0])}</b> <span style="color:var(--mut)">${esc(x[4])}</span>
  <p style="margin:4px 0">${esc(x[3])}${x[1]?`<br><span style="color:var(--mut);font-size:14px">Sinonimi: ${esc(x[1])}</span>`:""}</p><span class="tag">${esc(C[x[5]])}</span>
- ${fx(x)}${s3(x)}<h2>Interazioni proteiche (Atlas)</h2>${n>=0?`<div class="big">${n}</div><div class="bar"><i style="width:${pct(n)}%"></i></div><div style="font-size:14px"><b>${lab(n)}</b> · più connessa del ${pct(n)}% dei geni con dati</div>`:`<p style="margin:0;color:var(--mut)">Nessun dato di interazione.</p>`}
+ ${fx(x)}${s3(x)}${x[4]?`<button class="bt" onclick="asAdd(${i})">Aggiungi all’assemblatore</button>`:""}<h2>Interazioni proteiche (Atlas)</h2>${n>=0?`<div class="big">${n}</div><div class="bar"><i style="width:${pct(n)}%"></i></div><div style="font-size:14px"><b>${lab(n)}</b> · più connessa del ${pct(n)}% dei geni con dati</div>`:`<p style="margin:0;color:var(--mut)">Nessun dato di interazione.</p>`}
  ${str(i)}${graph(i)}${bgs(i)}<button class="bt" onclick="expP(${i})">Esporta partner (CSV)</button>
  <h2>Classi di proteina</h2>${chips(x[6],"kw")}<h2>Processi biologici</h2>${chips(x[7],"kw")}<h2>Funzione molecolare</h2>${chips(x[8],"kw")}<h2>Dove si trova</h2>${chips(x[10],"kw")}${gox(x)}${rx(x)}<h2>Malattie</h2>${chips(x[9],"kw")}
  <p style="margin:12px 0 0">${x[4]?`<a href="https://www.uniprot.org/uniprotkb/${esc(x[4])}" target="_blank" rel="noopener">UniProt</a> · `:""}<a href="https://www.proteinatlas.org/ENSG${esc(x[2])}" target="_blank" rel="noopener">Human Protein Atlas</a></p></div>
@@ -175,4 +175,74 @@ function enr(){const ids=new Set(),bad=[];$("gl").value.split(/[\s,;]+/).filter(
 document.body.insertAdjacentHTML("beforeend",`<div class="card" id="fonti"><h2>Fonti dei dati</h2><p style="margin:0 0 6px;font-size:14px"><b>Human Protein Atlas</b> — classi di proteina, descrizioni, localizzazione, malattie e numero di interazioni. <a href="https://www.proteinatlas.org" target="_blank" rel="noopener">www.proteinatlas.org</a></p><p style="margin:0 0 6px;font-size:14px"><b>UniProt</b> — Swiss-Prot umano: funzione curata e termini Gene Ontology. <a href="https://www.uniprot.org" target="_blank" rel="noopener">www.uniprot.org</a></p><p style="margin:0 0 6px;font-size:14px"><b>STRING v12.5</b> — interazioni fisiche tra proteine, con punteggio di affidabilità. <a href="https://string-db.org" target="_blank" rel="noopener">string-db.org</a></p><p style="margin:0 0 6px;font-size:14px"><b>BioGRID 5.0.262</b> — interazioni fisiche validate da più esperimenti (MV-Physical). <a href="https://thebiogrid.org" target="_blank" rel="noopener">thebiogrid.org</a></p><p style="margin:0 0 6px;font-size:14px"><b>Reactome</b> — vie biologiche umane (ReactomePathways.gmt). <a href="https://reactome.org" target="_blank" rel="noopener">reactome.org</a></p><p style="margin:0 0 6px;font-size:14px"><b>AlphaFold DB</b> — strutture 3D predette (EMBL-EBI e Google DeepMind), caricate dal sito al momento della richiesta. <a href="https://alphafold.ebi.ac.uk" target="_blank" rel="noopener">alphafold.ebi.ac.uk</a></p><p style="font-size:13px;margin:8px 0 0;color:var(--mut)" id="ct">Dati assemblati il 27/10/2026 da Human Protein Atlas, UniProt (Swiss-Prot umano, funzione e Gene Ontology), Reactome, STRING v12.5 (interazioni fisiche) e BioGRID 5.0.262 (MV-Physical). Le strutture 3D provengono da AlphaFold DB. Cita le pubblicazioni originali dei database usati.</p><button class="bt" onclick="cp()">Copia testo di citazione</button></div><div id="cxw" style="display:none"><h2>Testo/CSV (da copiare)</h2><textarea id="cx" rows="6"></textarea></div>`);
 function cp(){const t=$("ct").textContent+" Soglia STRING usata: "+TH+".";try{navigator.clipboard.writeText(t)}catch(e){}$("cx").value=t;$("cxw").style.display="block"}
 stat();list();
+var va=document.createElement("div");va.id="va";va.style.display="none";
+va.innerHTML=`<p class="s">Scegli fino a 3 proteine (modelli AlphaFold), spostale e ruotale: i residui all’interfaccia si colorano in base all’incastro.</p><input id="asq" placeholder="Gene (es. TP53)" autocapitalize="none"><button class="bt" onclick="asAdd()">Aggiungi</button><div id="asl"></div><div id="asmo"></div><canvas id="asc" style="width:100%;height:340px;border:1px solid var(--bd);border-radius:10px;touch-action:none;background:var(--card)"></canvas><label class="s" style="display:block">Avvicina / allontana la proteina attiva <input type="range" id="asz" min="-100" max="100" value="0" style="padding:0" oninput="asZ(+this.value)"></label><div id="asm" class="note"></div><div id="ass"></div><div class="note"><span style="color:#22b14c">●</span> verde: incastro compatibile · <span style="color:#f2c200">●</span> giallo: potrebbe interagire con un cambio conformazionale · <span style="color:#e0301e">●</span> rosso: scontro o incompatibilità. Euristica geometrica e chimica su corpi rigidi: non è un docking né una predizione di legame.</div>`;
+document.querySelector("#anc").before(va);
+var AS={ps:[],act:-1,mode:"v",Rc:[1,0,0,0,1,0,0,0,1],sc:4,D:300,cen:[0,0,0],pts:[],drag:null,zp:0};
+const COL=["#5b8bd6","#9a7bd0","#4fa6a0"],ST=["","#22b14c","#f2c200","#e0301e"];
+const mv=(M,p)=>[M[0]*p[0]+M[1]*p[1]+M[2]*p[2],M[3]*p[0]+M[4]*p[1]+M[5]*p[2],M[6]*p[0]+M[7]*p[1]+M[8]*p[2]];
+const mt=(M,p)=>[M[0]*p[0]+M[3]*p[1]+M[6]*p[2],M[1]*p[0]+M[4]*p[1]+M[7]*p[2],M[2]*p[0]+M[5]*p[1]+M[8]*p[2]];
+const mm=(A,B)=>{const o=[];for(let i=0;i<3;i++)for(let j=0;j<3;j++)o.push(A[i*3]*B[j]+A[i*3+1]*B[3+j]+A[i*3+2]*B[6+j]);return o};
+const rod=(a,th)=>{const n=Math.hypot(...a)||1,[x,y,z]=a.map(v=>v/n),c=Math.cos(th),s=Math.sin(th),C=1-c;return[c+x*x*C,x*y*C-z*s,x*z*C+y*s,y*x*C+z*s,c+y*y*C,y*z*C-x*s,z*x*C-y*s,z*y*C+x*s,c+z*z*C]};
+const wd=(p,a)=>{const q=mv(p.M,a);return[q[0]+p.t[0],q[1]+p.t[1],q[2]+p.t[2]]};
+function asParse(t){const R=[];let last="";for(const l of t.split("\n")){if(!l.startsWith("ATOM"))continue;const an=l.slice(12,16).trim(),el=(l.slice(76,78).trim()||an[0]).toUpperCase();if(el==="H")continue;const k=l.slice(22,27);
+ if(k!==last){last=k;R.push({n:l.slice(17,20),i:+l.slice(22,26),a:[],e:[],ca:null,pl:0})}
+ const r=R[R.length-1],p=[+l.slice(30,38),+l.slice(38,46),+l.slice(46,54)];r.a.push(p);r.e.push(el);if(an==="CA"){r.ca=p;r.pl=+l.slice(60,66)}}
+ return R.filter(r=>r.ca)}
+function asAddText(i,acc,txt){const R=asParse(txt);if(R.length<5)throw new Error("pdb");const n=R.length,c=[0,0,0];R.forEach(r=>{c[0]+=r.ca[0];c[1]+=r.ca[1];c[2]+=r.ca[2]});for(let k=0;k<3;k++)c[k]/=n;
+ const sh=p=>[p[0]-c[0],p[1]-c[1],p[2]-c[2]];R.forEach(r=>{r.a=r.a.map(sh);r.ca=sh(r.ca)});
+ const rad=Math.max(...R.map(r=>Math.hypot(...r.ca))),pv=AS.ps[AS.ps.length-1];
+ AS.ps.push({g:D[i][0],acc,R,M:[1,0,0,0,1,0,0,0,1],t:[pv?pv.t[0]+pv.rad+rad+8:0,0,0],rad,col:COL[AS.ps.length%3],st:new Uint8Array(n)});
+ AS.act=AS.ps.length-1;asList();asFit();asRun()}
+async function asAdd(i){tab(3);if(i===undefined)i=gi($("asq").value);const m=$("asm");
+ if(i===undefined){m.textContent="Gene non trovato.";return}const a=D[i][4];
+ if(!a){m.textContent="Nessun codice UniProt per questo gene.";return}
+ if(AS.ps.length>=3){m.textContent="Massimo 3 proteine: rimuovine una.";return}
+ if(AS.ps.some(p=>p.acc===a)){m.textContent="Già aggiunta.";return}
+ m.textContent="Scarico il modello AlphaFold di "+D[i][0]+"…";
+ try{let u;try{u=(await(await fetch("https://alphafold.ebi.ac.uk/api/prediction/"+a)).json())[0].pdbUrl}catch(e){u="https://alphafold.ebi.ac.uk/files/AF-"+a+"-F1-model_v4.pdb"}
+  asAddText(i,a,await(await fetch(u)).text());m.textContent=""}
+ catch(e){m.textContent="Modello non disponibile: assente o connessione bloccata (nell’anteprima di Claude le connessioni esterne sono bloccate; funziona su GitHub Pages)."}}
+function asDel(k){AS.ps.splice(k,1);AS.act=AS.ps.length-1;asList();asFit();asRun()}
+function asList(){$("asl").innerHTML=AS.ps.map((p,k)=>`<span class="kw" style="cursor:pointer;border-color:${p.col};${k==AS.act?"font-weight:600":""}" onclick="AS.act=${k};asList()">${esc(p.g)} · ${p.R.length} aa <b onclick="event.stopPropagation();asDel(${k})">✕</b></span>`).join("");
+ $("asmo").innerHTML=[["v","Vista"],["m","Sposta"],["r","Ruota"]].map(([m,t])=>`<button class="tb${AS.mode==m?" on":""}" onclick="AS.mode='${m}';asList()">${t}</button>`).join("")}
+function asFit(){const ps=AS.ps,cv=$("asc");if(!ps.length)return;const c=[0,0,0];ps.forEach(p=>{for(let k=0;k<3;k++)c[k]+=p.t[k]/ps.length});AS.cen=c;
+ const ex=Math.max(...ps.map(p=>Math.hypot(p.t[0]-c[0],p.t[1]-c[1],p.t[2]-c[2])+p.rad));AS.D=3*ex+100;AS.sc=.42*Math.min(cv.clientWidth||300,cv.clientHeight||300)/ex;asDraw()}
+function asDraw(){const cv=$("asc");if(!cv||!cv.getContext)return;const ctx=cv.getContext("2d");if(!ctx)return;const dpr=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W)return;
+ if(cv.width!==Math.round(W*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+ const pts=[];AS.ps.forEach((p,pi)=>{const pr=p.R.map(r=>{const w=wd(p,r.ca),q=mv(AS.Rc,[w[0]-AS.cen[0],w[1]-AS.cen[1],w[2]-AS.cen[2]]),f=AS.D/(AS.D+q[2]);return{x:W/2+AS.sc*q[0]*f,y:H/2-AS.sc*q[1]*f,z:q[2],f}});
+  ctx.beginPath();ctx.strokeStyle=p.col;ctx.globalAlpha=.55;ctx.lineWidth=1.3;pr.forEach((a,k)=>{const r=p.R[k],b=p.R[k-1];if(k&&Math.hypot(r.ca[0]-b.ca[0],r.ca[1]-b.ca[1],r.ca[2]-b.ca[2])<4.5){ctx.moveTo(pr[k-1].x,pr[k-1].y);ctx.lineTo(a.x,a.y)}});ctx.stroke();
+  pr.forEach((a,k)=>pts.push({x:a.x,y:a.y,z:a.z,f:a.f,pi,k}))});
+ pts.sort((a,b)=>b.z-a.z);pts.forEach(a=>{const p=AS.ps[a.pi],s=p.st[a.k];ctx.globalAlpha=s?1:.6;ctx.fillStyle=s?ST[s]:p.col;ctx.beginPath();ctx.arc(a.x,a.y,Math.max(1.4,AS.sc*(s?2:1.3)*a.f*.6),0,6.3);ctx.fill()});ctx.globalAlpha=1;AS.pts=pts}
+function asZ(v){const p=AS.ps[AS.act];if(!p){return}const d=mt(AS.Rc,[0,0,-(v-AS.zp)*.5]);AS.zp=v;for(let k=0;k<3;k++)p.t[k]+=d[k];asDraw();clearTimeout(AS.tm);AS.tm=setTimeout(asRun,150)}
+function asMove(p,dx,dy){const q=mv(AS.Rc,[p.t[0]-AS.cen[0],p.t[1]-AS.cen[1],p.t[2]-AS.cen[2]]),f=AS.D/(AS.D+q[2]),d=mt(AS.Rc,[dx/(AS.sc*f),-dy/(AS.sc*f),0]);for(let k=0;k<3;k++)p.t[k]+=d[k]}
+function asRot(p,dx,dy){p.M=mm(rod(mt(AS.Rc,[1,0,0]),-dy*.01),mm(rod(mt(AS.Rc,[0,1,0]),-dx*.01),p.M))}
+(function(){const cv=$("asc"),P=new Map();let ld=0;
+ cv.onpointerdown=e=>{try{cv.setPointerCapture(e.pointerId)}catch(x){}P.set(e.pointerId,[e.offsetX,e.offsetY]);AS.drag=null;
+  if(P.size==2){const [a,b]=[...P.values()];ld=Math.hypot(a[0]-b[0],a[1]-b[1]);return}
+  if(AS.mode!=="v"){let bd=900,b=null;AS.pts.forEach(a=>{const d=(a.x-e.offsetX)**2+(a.y-e.offsetY)**2;if(d<bd||(d==bd&&b&&a.z<b.z)){bd=d;b=a}});if(b){AS.drag=b.pi;AS.act=b.pi;AS.zp=0;$("asz").value=0;asList()}}};
+ cv.onpointermove=e=>{if(!P.has(e.pointerId))return;const o=P.get(e.pointerId),dx=e.offsetX-o[0],dy=e.offsetY-o[1];P.set(e.pointerId,[e.offsetX,e.offsetY]);
+  if(P.size==2){const [a,b]=[...P.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(ld)AS.sc*=d/ld;ld=d;asDraw();return}
+  const p=AS.drag!=null?AS.ps[AS.drag]:null;if(p&&AS.mode==="m")asMove(p,dx,dy);else if(p)asRot(p,dx,dy);else AS.Rc=mm(rod([1,0,0],-dy*.01),mm(rod([0,1,0],-dx*.01),AS.Rc));asDraw()};
+ cv.onpointerup=cv.onpointercancel=e=>{P.delete(e.pointerId);ld=0;if(AS.drag!=null){AS.drag=null;asRun()}};
+ cv.onwheel=e=>{e.preventDefault();AS.sc*=e.deltaY<0?1.1:.9;asDraw()}})();
+const POS=new Set(["ARG","LYS"]),NEG=new Set(["ASP","GLU"]),HYD=new Set(["ALA","VAL","LEU","ILE","MET","PHE","TRP","PRO","CYS"]),POL=new Set(["SER","THR","ASN","GLN","HIS","TYR","GLY"]),CH=u=>POS.has(u)||NEG.has(u);
+function asCls(a,b,d,pp,pl){const like=(POS.has(a)&&POS.has(b))||(NEG.has(a)&&NEG.has(b)),opp=(POS.has(a)&&NEG.has(b))||(NEG.has(a)&&POS.has(b)),hh=HYD.has(a)&&HYD.has(b),hp=(CH(a)||POL.has(a))&&(CH(b)||POL.has(b)),bad=(HYD.has(a)&&CH(b))||(HYD.has(b)&&CH(a));
+ if(d<(pp?2.4:3))return 3;if(like&&d<6)return 3;const good=opp||hh||(hp&&pp&&!like);
+ if(d<=4.5)return good?1:bad?3:2;if(d<=8)return(good||pl<70)?2:0;return 0}
+const mg=(o,n)=>o==3||n==3?3:o==1||n==1?1:Math.max(o,n);
+function asRun(){const ps=AS.ps;ps.forEach(p=>{p.st=new Uint8Array(p.R.length);p.ct=[]});
+ if(ps.length<2){$("ass").innerHTML="";asDraw();return}
+ const W=ps.map(p=>{const X=[],RI=[],EL=[],G=new Map(),key=(x,y,z)=>(Math.floor(x/8)+512)*1048576+(Math.floor(y/8)+512)*1024+Math.floor(z/8)+512;
+  p.R.forEach((r,ri)=>r.a.forEach((a,k)=>{const w=wd(p,a),n=RI.length;X.push(w[0],w[1],w[2]);RI.push(ri);EL.push(r.e[k]);const q=key(w[0],w[1],w[2]);(G.get(q)||G.set(q,[]).get(q)).push(n)}));return{X,RI,EL,G,key}});
+ const pairs=[];
+ for(let a=0;a<ps.length;a++)for(let b=0;b<ps.length;b++){if(a==b)continue;const A=W[a],B=W[b],bd=new Float64Array(ps[a].R.length).fill(99),bi=new Int32Array(ps[a].R.length),bj=new Int32Array(ps[a].R.length);
+  for(let i=0;i<A.RI.length;i++){const x=A.X[i*3],y=A.X[i*3+1],z=A.X[i*3+2],cx=Math.floor(x/8),cy=Math.floor(y/8),cz=Math.floor(z/8);
+   for(let u=-1;u<2;u++)for(let v=-1;v<2;v++)for(let w=-1;w<2;w++){const c=B.G.get((cx+u+512)*1048576+(cy+v+512)*1024+cz+w+512);if(!c)continue;
+    for(const j of c){const d=Math.hypot(x-B.X[j*3],y-B.X[j*3+1],z-B.X[j*3+2]),ri=A.RI[i];if(d<bd[ri]){bd[ri]=d;bi[ri]=i;bj[ri]=j}}}}
+  ps[a].R.forEach((r,ri)=>{if(bd[ri]>8)return;const q=ps[b].R[B.RI[bj[ri]]],pp="NO".includes(A.EL[bi[ri]])&&"NO".includes(B.EL[bj[ri]]),c=asCls(r.n,q.n,bd[ri],pp,Math.min(r.pl,q.pl));
+   if(c){ps[a].st[ri]=mg(ps[a].st[ri],c);if(c==1)ps[a].ct.push({ri,b,rj:B.RI[bj[ri]],d:bd[ri]})}})}
+ const n=[0,0,0,0];ps.forEach(p=>p.st.forEach(s=>n[s]++));const t=n[1]+n[2]+n[3],seen=new Set(),L=[];
+ ps.forEach((p,a)=>p.ct.sort((u,v)=>u.d-v.d).forEach(c=>{const q=ps[c.b],k=[a+":"+c.ri,c.b+":"+c.rj].sort().join("|");if(seen.has(k))return;seen.add(k);L.push(`${p.R[c.ri].n}${p.R[c.ri].i} (${esc(p.g)}) ↔ ${q.R[c.rj].n}${q.R[c.rj].i} (${esc(q.g)}) · ${c.d.toFixed(1)} Å`)}));
+ $("ass").innerHTML=`<div class="card"><b>Interfaccia</b>: ${t} residui<br><span style="color:#22b14c">●</span> ${n[1]} verdi · <span style="color:#f2c200">●</span> ${n[2]} gialli · <span style="color:#e0301e">●</span> ${n[3]} rossi<br>${t?`Indice di incastro: <b>${Math.round(n[1]/t*100)}%</b> (verdi sul totale dei residui all’interfaccia)`:"Le proteine sono troppo lontane: avvicinale."}${L.length?`<h2>Contatti compatibili più vicini</h2><div style="font-size:13px">${L.slice(0,8).join("<br>")}</div>`:""}</div>`;asDraw()}
 </script></body></html>
