@@ -101,7 +101,7 @@ const ch=(j,t)=>`<span class="kw" style="cursor:pointer" onclick="det(${j})">${e
 const mp=a=>{const o={};for(let k=0;k<a.length;k+=2)o[a[k]]=a[k+1];return o};
 function stat(){PC=D.map((x,i)=>sp(i).length/2);$("st").textContent=D.length.toLocaleString("it")+" geni · "+PC.filter(v=>v).length.toLocaleString("it")+" con partner STRING (≥ "+TH+") · "+D.filter(x=>x[14].length).length.toLocaleString("it")+" con conferma BioGRID"}
 document.head.insertAdjacentHTML("beforeend",`<style>.tb,.bt{border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:10px;padding:8px 12px;font-size:15px;margin:0 6px 8px 0}.tb.on,.bt{background:var(--ac2);color:var(--ac);border-color:var(--ac)}.bt{margin:4px 0 8px}textarea{width:100%;padding:10px;font-size:15px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg)}table{width:100%;border-collapse:collapse;font-size:13px}td{padding:4px 6px;border-bottom:1px solid var(--bd);vertical-align:top}svg text{fill:var(--fg)}</style>`);
-const v0=document.createElement("div");v0.id="v0";["q","cat","so","out"].forEach(id=>v0.appendChild($(id)));
+const v0=document.createElement("div");v0.id="v0";["q","cat","so","out"].forEach(id=>v0.appendChild($(id)));{const dt=document.createElement("div");dt.id="dt";dt.innerHTML=`<div class="card" style="color:var(--mut)">Seleziona una proteina dall’elenco per vederne la scheda.</div>`;v0.appendChild(dt)}
 const v1=document.createElement("div");v1.id="v1";v1.style.display="none";
 v1.innerHTML=`<p class="s">Confronta due geni: interazione diretta e partner in comune.</p><input id="ca" placeholder="Gene A (es. TP53)" autocapitalize="none"><input id="cb" placeholder="Gene B (es. MDM2)" autocapitalize="none"><button class="bt" onclick="cmp()">Confronta</button><div id="co"></div>`;
 const v2=document.createElement("div");v2.id="v2";v2.style.display="none";
@@ -180,24 +180,48 @@ function enr(){const ids=new Set(),bad=[];$("gl").value.split(/[\s,;]+/).filter(
 document.body.insertAdjacentHTML("beforeend",`<div class="card" id="fonti"><h2>Fonti dei dati</h2><p style="margin:0 0 6px;font-size:14px"><b>Human Protein Atlas</b> — classi di proteina, descrizioni, localizzazione, malattie e numero di interazioni. <a href="https://www.proteinatlas.org" target="_blank" rel="noopener">www.proteinatlas.org</a></p><p style="margin:0 0 6px;font-size:14px"><b>UniProt</b> — Swiss-Prot umano: funzione curata e termini Gene Ontology. <a href="https://www.uniprot.org" target="_blank" rel="noopener">www.uniprot.org</a></p><p style="margin:0 0 6px;font-size:14px"><b>STRING v12.5</b> — interazioni fisiche tra proteine, con punteggio di affidabilità. <a href="https://string-db.org" target="_blank" rel="noopener">string-db.org</a></p><p style="margin:0 0 6px;font-size:14px"><b>BioGRID 5.0.262</b> — interazioni fisiche validate da più esperimenti (MV-Physical). <a href="https://thebiogrid.org" target="_blank" rel="noopener">thebiogrid.org</a></p><p style="margin:0 0 6px;font-size:14px"><b>Gene Ontology</b> — ontologia dei termini (go-basic, versione 2026-07-26), usata per propagare le annotazioni nell’arricchimento. <a href="https://geneontology.org" target="_blank" rel="noopener">geneontology.org</a></p><p style="margin:0 0 6px;font-size:14px"><b>Reactome</b> — vie biologiche umane (ReactomePathways.gmt). <a href="https://reactome.org" target="_blank" rel="noopener">reactome.org</a></p><p style="margin:0 0 6px;font-size:14px"><b>AlphaFold DB</b> — strutture 3D predette (EMBL-EBI e Google DeepMind), caricate dal sito al momento della richiesta. <a href="https://alphafold.ebi.ac.uk" target="_blank" rel="noopener">alphafold.ebi.ac.uk</a></p><p style="font-size:13px;margin:8px 0 0;color:var(--mut)" id="ct">Dati assemblati il 27/10/2026 da Human Protein Atlas, UniProt (Swiss-Prot umano, funzione e Gene Ontology), Reactome, Gene Ontology (go-basic 2026-07-26), STRING v12.5 (interazioni fisiche) e BioGRID 5.0.262 (MV-Physical). Le strutture 3D provengono da AlphaFold DB. Cita le pubblicazioni originali dei database usati.</p><button class="bt" onclick="cp()">Copia testo di citazione</button></div><div id="cxw" style="display:none"><h2>Testo/CSV (da copiare)</h2><textarea id="cx" rows="6"></textarea></div>`);
 function cp(){const t=$("ct").textContent+" Soglia STRING usata: "+TH+".";try{navigator.clipboard.writeText(t)}catch(e){}$("cx").value=t;$("cxw").style.display="block"}
 stat();list();
+document.head.insertAdjacentHTML("beforeend",`<style>.pn{display:contents}#dt{display:none}.sl{display:inline-block;border:1px solid var(--bd);border-radius:99px;padding:1px 10px;font-size:12px;margin:0 6px 4px 0;text-decoration:none;color:var(--ac)}
+@media (min-width:600px){body{max-width:760px}}
+@media (min-width:900px){body{max-width:1560px;padding:18px 28px}h1{font-size:24px}.topb{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+#v0{display:grid;grid-template-columns:minmax(320px,400px) minmax(0,1fr);column-gap:22px;align-items:start}#v0>*{grid-column:1}#v0>#dt{display:block;grid-column:2;grid-row:1/span 6}
+#out{max-height:calc(100vh - 240px);overflow:auto;padding-right:4px}.dgw{border:0!important;background:none!important;padding:0!important;margin-top:0!important}
+.dg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}.pn{display:block;border:1px solid var(--bd);border-radius:12px;padding:14px;background:var(--card);min-width:0}.pn.w{grid-column:1/-1}.dgw>.pn.w{margin-top:0}.pn>h2:first-child{margin-top:0}
+#v1{display:grid;grid-template-columns:1fr 1fr auto;gap:0 12px;align-items:start}#v1>p,#v1>#co{grid-column:1/-1}
+#v2{display:grid;grid-template-columns:minmax(300px,420px) minmax(0,1fr);column-gap:20px;align-items:start}#v2>p{grid-column:1/-1}#v2>#gl,#v2>button{grid-column:1}#v2>#eo{grid-column:2;grid-row:2/span 3}
+#va{display:grid;grid-template-columns:minmax(0,1fr) 340px;column-gap:20px;align-items:start}#asc{height:min(72vh,760px)!important}.aR{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}}
+@media (min-width:1400px){.dg{grid-template-columns:repeat(3,minmax(0,1fr))}}</style>`);
+tb.className="topb";
+const MQ=window.matchMedia?matchMedia("(min-width:900px)"):{matches:false},DESK=()=>MQ.matches;var LD=null;
+const srcL=x=>{const g=encodeURIComponent(x[0]),a=x[4];return[a&&["UniProt","https://www.uniprot.org/uniprotkb/"+a],["Human Protein Atlas","https://www.proteinatlas.org/ENSG"+x[2]],["STRING","https://string-db.org/cgi/network?identifiers="+g+"&species=9606"],["BioGRID","https://thebiogrid.org/search.php?search="+g+"&organism=9606"],["Reactome","https://reactome.org/content/query?q="+g+"&species=Homo+sapiens"],a&&["AlphaFold DB","https://alphafold.ebi.ac.uk/entry/"+a],a&&["QuickGO","https://www.ebi.ac.uk/QuickGO/annotations?geneProductId="+a]].filter(Boolean).map(([n,u])=>`<a class="sl" href="${u}" target="_blank" rel="noopener">${n}</a>`).join("")};
+const pn=(s,c)=>s.replace(/<[^>]*>|\s/g,"")?`<div class="pn${c?" "+c:""}">${s}</div>`:"";
+function det(i){tab(0);LD=i;const x=D[i],n=x[11],ph=!DESK(),t=ph?$("out"):$("dt");
+ t.innerHTML=`<div class="card dgw"><div class="pn w"><b style="font-size:20px">${esc(x[0])}</b> <span style="color:var(--mut)">${esc(x[4])}</span><div style="margin:6px 0 2px">${srcL(x)}</div><p style="margin:4px 0">${esc(x[3])}${x[1]?`<br><span style="color:var(--mut);font-size:14px">Sinonimi: ${esc(x[1])}</span>`:""}</p><span class="tag">${esc(C[x[5]])}</span></div><div class="dg">`
+ +pn(fx(x)+s3(x)+(x[4]?`<button class="bt" onclick="asAdd(${i})">Aggiungi all’assemblatore</button>`:""))
+ +pn(`<h2>Interazioni proteiche (Atlas)</h2>${n>=0?`<div class="big">${n}</div><div class="bar"><i style="width:${pct(n)}%"></i></div><div style="font-size:14px"><b>${lab(n)}</b> · più connessa del ${pct(n)}% dei geni con dati</div>`:`<p style="margin:0;color:var(--mut)">Nessun dato di interazione.</p>`}${str(i)}`)
+ +pn(graph(i))+pn(bgs(i)+`<button class="bt" onclick="expP(${i})">Esporta partner (CSV)</button>`)
+ +pn(`<h2>Classi di proteina</h2>${chips(x[6],"kw")}<h2>Processi biologici</h2>${chips(x[7],"kw")}<h2>Funzione molecolare</h2>${chips(x[8],"kw")}<h2>Dove si trova</h2>${chips(x[10],"kw")}${gox(x)}${rx(x)}<h2>Malattie</h2>${chips(x[9],"kw")}`,"w")
+ +`</div></div>`+(ph?`<div class="it" onclick="list()" style="text-align:center">← Torna ai risultati</div>`:"");if(ph)window.scrollTo(0,0)}
 var va=document.createElement("div");va.id="va";va.style.display="none";
-va.innerHTML=`<p class="s">Scegli fino a 3 proteine (modelli AlphaFold), spostale e ruotale: i residui all’interfaccia si colorano in base all’incastro.</p><input id="asq" placeholder="Gene (es. TP53)" autocapitalize="none"><button class="bt" onclick="asAdd()">Aggiungi</button><div id="asl"></div><div id="asmo"></div><canvas id="asc" style="width:100%;height:340px;border:1px solid var(--bd);border-radius:10px;touch-action:none;background:var(--card)"></canvas><label class="s" style="display:block">Avvicina / allontana la proteina attiva <input type="range" id="asz" min="-100" max="100" value="0" style="padding:0" oninput="asZ(+this.value)"></label><div id="asm" class="note"></div><div id="ass"></div><div class="note"><span style="color:#22b14c">●</span> verde: incastro compatibile · <span style="color:#f2c200">●</span> giallo: potrebbe interagire con un cambio conformazionale · <span style="color:#e0301e">●</span> rosso: scontro tra atomi o cariche uguali vicine. Euristica geometrica e chimica su corpi rigidi: non è un docking né una predizione di legame.</div>`;
+va.innerHTML=`<div class="aL"><p class="s">Scegli fino a 3 proteine (modelli AlphaFold), spostale e ruotale: i residui all’interfaccia si colorano in base all’incastro.</p><input id="asq" placeholder="Gene (es. TP53)" autocapitalize="none"><button class="bt" onclick="asAdd()">Aggiungi</button><div id="asl"></div><div id="asmo"></div><canvas id="asc" style="width:100%;height:340px;border:1px solid var(--bd);border-radius:10px;touch-action:none;background:var(--card)"></canvas><label class="s" style="display:block">Avvicina / allontana la proteina attiva <input type="range" id="asz" min="-100" max="100" value="0" style="padding:0" oninput="asZ(+this.value)"></label><div id="asm" class="note"></div></div><div class="aR"><div id="ass"></div><div id="asi"></div><div class="note"><span style="color:#22b14c">●</span> verde: incastro compatibile · <span style="color:#f2c200">●</span> giallo: potrebbe interagire con un cambio conformazionale · <span style="color:#e0301e">●</span> rosso: scontro tra atomi o cariche uguali vicine. Euristica geometrica e chimica su corpi rigidi: non è un docking né una predizione di legame.<br>Zoomando compaiono le lettere degli amminoacidi. Catene laterali: carbonio nel colore del residuo, N blu, O grigio scuro, S viola.</div></div>`;
 document.querySelector("#anc").before(va);
-var AS={ps:[],act:-1,mode:"v",Rc:[1,0,0,0,1,0,0,0,1],sc:4,D:300,cen:[0,0,0],pts:[],drag:null,zp:0};
-const COL=["#5b8bd6","#9a7bd0","#4fa6a0"],ST=["","#22b14c","#f2c200","#e0301e"];
+var AS={ps:[],act:-1,mode:"v",sty:"c",Rc:[1,0,0,0,1,0,0,0,1],sc:4,D:300,cen:[0,0,0],pts:[],drag:null,zp:0,sel:new Set()};
+const COL=["#5b8bd6","#9a7bd0","#4fa6a0"],ST=["","#22b14c","#f2c200","#e0301e"],EC={N:"#2f6fe0",O:"#3a3a3a",S:"#8e44ad"},VR={C:1.7,N:1.55,O:1.52,S:1.8};
+const AA={ALA:"A",ARG:"R",ASN:"N",ASP:"D",CYS:"C",GLN:"Q",GLU:"E",GLY:"G",HIS:"H",ILE:"I",LEU:"L",LYS:"K",MET:"M",PHE:"F",PRO:"P",SER:"S",THR:"T",TRP:"W",TYR:"Y",VAL:"V"};
 const mv=(M,p)=>[M[0]*p[0]+M[1]*p[1]+M[2]*p[2],M[3]*p[0]+M[4]*p[1]+M[5]*p[2],M[6]*p[0]+M[7]*p[1]+M[8]*p[2]];
 const mt=(M,p)=>[M[0]*p[0]+M[3]*p[1]+M[6]*p[2],M[1]*p[0]+M[4]*p[1]+M[7]*p[2],M[2]*p[0]+M[5]*p[1]+M[8]*p[2]];
 const mm=(A,B)=>{const o=[];for(let i=0;i<3;i++)for(let j=0;j<3;j++)o.push(A[i*3]*B[j]+A[i*3+1]*B[3+j]+A[i*3+2]*B[6+j]);return o};
 const rod=(a,th)=>{const n=Math.hypot(...a)||1,[x,y,z]=a.map(v=>v/n),c=Math.cos(th),s=Math.sin(th),C=1-c;return[c+x*x*C,x*y*C-z*s,x*z*C+y*s,y*x*C+z*s,c+y*y*C,y*z*C-x*s,z*x*C-y*s,z*y*C+x*s,c+z*z*C]};
 const wd=(p,a)=>{const q=mv(p.M,a);return[q[0]+p.t[0],q[1]+p.t[1],q[2]+p.t[2]]};
+const dst=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
 function asParse(t){const R=[];let last="";for(const l of t.split("\n")){if(!l.startsWith("ATOM"))continue;const an=l.slice(12,16).trim(),el=(l.slice(76,78).trim()||an[0]).toUpperCase();if(el==="H")continue;const k=l.slice(22,27);
  if(k!==last){last=k;R.push({n:l.slice(17,20),i:+l.slice(22,26),a:[],e:[],ca:null,pl:0})}
  const r=R[R.length-1],p=[+l.slice(30,38),+l.slice(38,46),+l.slice(46,54)];r.a.push(p);r.e.push(el);if(an==="CA"){r.ca=p;r.pl=+l.slice(60,66)}}
  return R.filter(r=>r.ca)}
+function spl(R){const o=[],n=R.length;for(let i=0;i<n;i++){o.push({p:R[i].ca,r:i,brk:i>0&&dst(R[i].ca,R[i-1].ca)>4.5});if(i<n-1&&dst(R[i].ca,R[i+1].ca)<=4.5){const P0=R[Math.max(0,i-1)].ca,P1=R[i].ca,P2=R[i+1].ca,P3=R[Math.min(n-1,i+2)].ca;for(const t of[1/3,2/3]){const t2=t*t,t3=t2*t;o.push({p:[0,1,2].map(k=>.5*(2*P1[k]+(-P0[k]+P2[k])*t+(2*P0[k]-5*P1[k]+4*P2[k]-P3[k])*t2+(-P0[k]+3*P1[k]-3*P2[k]+P3[k])*t3)),r:t<.5?i:i+1,brk:false})}}}return o}
 function asAddText(i,acc,txt){const R=asParse(txt);if(R.length<5)throw new Error("pdb");const n=R.length,c=[0,0,0];R.forEach(r=>{c[0]+=r.ca[0];c[1]+=r.ca[1];c[2]+=r.ca[2]});for(let k=0;k<3;k++)c[k]/=n;
  const sh=p=>[p[0]-c[0],p[1]-c[1],p[2]-c[2]];R.forEach(r=>{r.a=r.a.map(sh);r.ca=sh(r.ca)});
  const rad=Math.max(...R.map(r=>Math.hypot(...r.ca))),pv=AS.ps[AS.ps.length-1];
- AS.ps.push({g:D[i][0],acc,R,M:[1,0,0,0,1,0,0,0,1],t:[pv?pv.t[0]+pv.rad+rad+8:0,0,0],rad,col:COL[AS.ps.length%3],st:new Uint8Array(n)});
+ AS.ps.push({g:D[i][0],acc,R,sp:spl(R),M:[1,0,0,0,1,0,0,0,1],t:[pv?pv.t[0]+pv.rad+rad+8:0,0,0],rad,col:COL[AS.ps.length%3],st:new Uint8Array(n)});
  AS.act=AS.ps.length-1;asList();asFit();asRun()}
 async function asAdd(i){tab(3);if(i===undefined)i=gi($("asq").value);const m=$("asm");
  if(i===undefined){m.textContent="Gene non trovato.";return}const a=D[i][4];
@@ -208,36 +232,61 @@ async function asAdd(i){tab(3);if(i===undefined)i=gi($("asq").value);const m=$("
  try{let u;try{u=(await(await fetch("https://alphafold.ebi.ac.uk/api/prediction/"+a)).json())[0].pdbUrl}catch(e){u="https://alphafold.ebi.ac.uk/files/AF-"+a+"-F1-model_v4.pdb"}
   asAddText(i,a,await(await fetch(u)).text());m.textContent=""}
  catch(e){m.textContent="Modello non disponibile: assente o connessione bloccata (nell’anteprima di Claude le connessioni esterne sono bloccate; funziona su GitHub Pages)."}}
-function asDel(k){AS.ps.splice(k,1);AS.act=AS.ps.length-1;asList();asFit();asRun()}
-function asList(){$("asl").innerHTML=AS.ps.map((p,k)=>`<span class="kw" style="cursor:pointer;border-color:${p.col};${k==AS.act?"font-weight:600":""}" onclick="AS.act=${k};asList()">${esc(p.g)} · ${p.R.length} aa <b onclick="event.stopPropagation();asDel(${k})">✕</b></span>`).join("");
- $("asmo").innerHTML=[["v","Vista"],["m","Sposta"],["r","Ruota"]].map(([m,t])=>`<button class="tb${AS.mode==m?" on":""}" onclick="AS.mode='${m}';asList()">${t}</button>`).join("")}
+function asDel(k){AS.ps.splice(k,1);AS.sel.clear();AS.act=AS.ps.length-1;asList();asFit();asRun()}
+function asList(){const b=(m,t,o)=>`<button class="tb${o?" on":""}" onclick="${m}">${t}</button>`;
+ $("asl").innerHTML=AS.ps.map((p,k)=>`<span class="kw" style="cursor:pointer;border-color:${p.col};${k==AS.act?"font-weight:600":""}" onclick="AS.act=${k};asList()">${esc(p.g)} · ${p.R.length} aa <b onclick="event.stopPropagation();asDel(${k})">✕</b></span>`).join("");
+ $("asmo").innerHTML=[["v","Vista"],["m","Sposta"],["r","Ruota"],["s","Seleziona"]].map(([m,t])=>b(`AS.mode='${m}';asList()`,t,AS.mode==m)).join("")+"<br>"+[["c","Semplificato"],["n","Nastro (stile AlphaFold)"],["f","Spacefilling"]].map(([m,t])=>b(`AS.sty='${m}';asList();asDraw()`,t,AS.sty==m)).join("")+"<br>"+b("asSelI()","Seleziona interfaccia")+b("AS.sel.clear();asInfo();asDraw()","Cancella selezione")}
+function asInfo(){const L=[...AS.sel].map(k=>{const pi=Math.floor(k/1e5),ri=k%1e5,p=AS.ps[pi];if(!p||!p.R[ri])return"";const r=p.R[ri],s=p.st[ri];return`<div style="font-size:13px"><span style="color:${s?ST[s]:"var(--mut)"}">●</span> ${r.n} ${r.i} (${AA[r.n]||"?"}) · ${esc(p.g)}${s?" · "+["","verde","giallo","rosso"][s]:""} · pLDDT ${r.pl.toFixed(0)}</div>`}).filter(Boolean);$("asi").innerHTML=L.length?`<div class="card"><h2 style="margin-top:0">Residui selezionati (${L.length})</h2>${L.slice(0,30).join("")}${L.length>30?"…":""}</div>`:""}
+function asSelI(){AS.sel.clear();let c=0;AS.ps.forEach((p,pi)=>p.st.forEach((s,ri)=>{if(s&&c<80){AS.sel.add(pi*1e5+ri);c++}}));asInfo();asDraw()}
 function asFit(){const ps=AS.ps,cv=$("asc");if(!ps.length)return;const c=[0,0,0];ps.forEach(p=>{for(let k=0;k<3;k++)c[k]+=p.t[k]/ps.length});AS.cen=c;
  const ex=Math.max(...ps.map(p=>Math.hypot(p.t[0]-c[0],p.t[1]-c[1],p.t[2]-c[2])+p.rad));AS.D=3*ex+100;AS.sc=.42*Math.min(cv.clientWidth||300,cv.clientHeight||300)/ex;asDraw()}
+const bonds=r=>{if(r._b)return r._b;const b=[],a=r.a;for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length;j++)if((a[i][0]-a[j][0])**2+(a[i][1]-a[j][1])**2+(a[i][2]-a[j][2])**2<3.6)b.push([i,j]);return r._b=b};
+function fatoms(p){if(p.fa)return p.fa;let n=0;p.R.forEach(r=>n+=r.a.length);const X=new Float32Array(n*3),RI=new Int32Array(n),RD=new Float32Array(n);let k=0;p.R.forEach((r,ri)=>r.a.forEach((a,j)=>{X[k*3]=a[0];X[k*3+1]=a[1];X[k*3+2]=a[2];RI[k]=ri;RD[k]=VR[r.e[j]]||1.7;k++}));return p.fa={X,RI,RD,n}}
 function asDraw(){const cv=$("asc");if(!cv||!cv.getContext)return;const ctx=cv.getContext("2d");if(!ctx)return;const dpr=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W)return;
- if(cv.width!==Math.round(W*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
- const pts=[];AS.ps.forEach((p,pi)=>{const pr=p.R.map(r=>{const w=wd(p,r.ca),q=mv(AS.Rc,[w[0]-AS.cen[0],w[1]-AS.cen[1],w[2]-AS.cen[2]]),f=AS.D/(AS.D+q[2]);return{x:W/2+AS.sc*q[0]*f,y:H/2-AS.sc*q[1]*f,z:q[2],f}});
-  ctx.beginPath();ctx.strokeStyle=p.col;ctx.globalAlpha=.55;ctx.lineWidth=1.3;pr.forEach((a,k)=>{const r=p.R[k],b=p.R[k-1];if(k&&Math.hypot(r.ca[0]-b.ca[0],r.ca[1]-b.ca[1],r.ca[2]-b.ca[2])<4.5){ctx.moveTo(pr[k-1].x,pr[k-1].y);ctx.lineTo(a.x,a.y)}});ctx.stroke();
-  pr.forEach((a,k)=>pts.push({x:a.x,y:a.y,z:a.z,f:a.f,pi,k}))});
- pts.sort((a,b)=>b.z-a.z);pts.forEach(a=>{const p=AS.ps[a.pi],s=p.st[a.k];ctx.globalAlpha=s?1:.6;ctx.fillStyle=s?ST[s]:p.col;ctx.beginPath();ctx.arc(a.x,a.y,Math.max(1.4,AS.sc*(s?2:1.3)*a.f*.6),0,6.3);ctx.fill()});ctx.globalAlpha=1;AS.pts=pts}
+ if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);ctx.lineCap="round";ctx.lineJoin="round";ctx.globalAlpha=1;
+ const A=AS,sty=A.sty,T=A.ps.map(p=>({K:mm(A.Rc,p.M),tc:mv(A.Rc,[p.t[0]-A.cen[0],p.t[1]-A.cen[1],p.t[2]-A.cen[2]])}));
+ const pj=(t,a)=>{const K=t.K,c=t.tc,x=K[0]*a[0]+K[1]*a[1]+K[2]*a[2]+c[0],y=K[3]*a[0]+K[4]*a[1]+K[5]*a[2]+c[1],z=K[6]*a[0]+K[7]*a[1]+K[8]*a[2]+c[2],f=A.D/(A.D+z);return{x:W/2+A.sc*x*f,y:H/2-A.sc*y*f,z,f}};
+ const PR=A.ps.map((p,pi)=>p.R.map(r=>pj(T[pi],r.ca))),pts=[];PR.forEach((a,pi)=>a.forEach((q,k)=>pts.push({x:q.x,y:q.y,z:q.z,f:q.f,pi,k})));A.pts=pts;
+ const col=(p,ri)=>p.st[ri]?ST[p.st[ri]]:p.col,so=pts.slice().sort((a,b)=>b.z-a.z);
+ if(sty==="c"){A.ps.forEach((p,pi)=>{ctx.beginPath();ctx.strokeStyle=p.col;ctx.globalAlpha=.55;ctx.lineWidth=1.3;PR[pi].forEach((a,k)=>{if(k&&dst(p.R[k].ca,p.R[k-1].ca)<4.5){ctx.moveTo(PR[pi][k-1].x,PR[pi][k-1].y);ctx.lineTo(a.x,a.y)}});ctx.stroke()});
+  so.forEach(a=>{const p=A.ps[a.pi],s=p.st[a.k];ctx.globalAlpha=s?1:.6;ctx.fillStyle=s?ST[s]:p.col;ctx.beginPath();ctx.arc(a.x,a.y,Math.max(1.4,A.sc*(s?2:1.3)*a.f*.6),0,6.3);ctx.fill()})}
+ else if(sty==="n"){const seg=[];A.ps.forEach((p,pi)=>{const S=p.sp,Q=S.map(s=>pj(T[pi],s.p));for(let k=0;k<S.length-1;k++){if(S[k+1].brk)continue;const a=Q[k],b=Q[k+1],ri=S[k].r;seg.push({a,b,z:(a.z+b.z)/2,f:(a.f+b.f)/2,c:col(p,ri),i:p.st[ri]})}});
+  seg.sort((a,b)=>b.z-a.z);const z1=seg.length?seg[seg.length-1].z:0,z0=seg.length?seg[0].z:1;
+  seg.forEach(s=>{const w=Math.max(2.2,A.sc*s.f*1.5)*(s.i?1.25:1);ctx.globalAlpha=.55+.45*((z0-s.z)/((z0-z1)||1));ctx.beginPath();ctx.moveTo(s.a.x,s.a.y);ctx.lineTo(s.b.x,s.b.y);ctx.strokeStyle="rgba(0,0,0,.5)";ctx.lineWidth=w+2;ctx.stroke();ctx.strokeStyle=s.c;ctx.lineWidth=w;ctx.stroke()})}
+ else{const Z=[],X=[],Y=[],RR=[],CC=[];A.ps.forEach((p,pi)=>{const fa=fatoms(p),t=T[pi];for(let k=0;k<fa.n;k++){const q=pj(t,[fa.X[k*3],fa.X[k*3+1],fa.X[k*3+2]]);Z.push(q.z);X.push(q.x);Y.push(q.y);RR.push(fa.RD[k]*A.sc*q.f);CC.push(col(p,fa.RI[k]))}});
+  const o=Z.map((_,i)=>i).sort((a,b)=>Z[b]-Z[a]),z1=Z.length?Math.min(...Z):0,z0=Z.length?Math.max(...Z):1;ctx.strokeStyle="rgba(0,0,0,.3)";ctx.lineWidth=.6;
+  o.forEach(i=>{ctx.globalAlpha=.55+.45*((z0-Z[i])/((z0-z1)||1));ctx.fillStyle=CC[i];ctx.beginPath();ctx.arc(X[i],Y[i],Math.max(.8,RR[i]),0,6.3);ctx.fill();if(RR[i]>3)ctx.stroke()})}
+ ctx.globalAlpha=1;
+ A.sel.forEach(k=>{const pi=Math.floor(k/1e5),ri=k%1e5,p=A.ps[pi];if(!p||!p.R[ri])return;const r=p.R[ri],c=col(p,ri),s0=PR[pi][ri];
+  if(sty!=="f"){const q=r.a.map(a=>pj(T[pi],a));ctx.strokeStyle=c;ctx.lineWidth=Math.max(1.6,A.sc*s0.f*.45);bonds(r).forEach(([i,j])=>{ctx.beginPath();ctx.moveTo(q[i].x,q[i].y);ctx.lineTo(q[j].x,q[j].y);ctx.stroke()});
+   q.forEach((s,j)=>{ctx.fillStyle=EC[r.e[j]]||c;ctx.beginPath();ctx.arc(s.x,s.y,Math.max(1.8,A.sc*s.f*.5),0,6.3);ctx.fill()})}
+  ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.beginPath();ctx.arc(s0.x,s0.y,Math.max(6,A.sc*s0.f*2.4),0,6.3);ctx.stroke()});
+ if(sty!=="f"){const sp0=A.sc*3.8;ctx.textAlign="center";ctx.textBaseline="middle";ctx.lineWidth=3;ctx.strokeStyle="rgba(0,0,0,.65)";ctx.fillStyle="#fff";
+  so.forEach(a=>{const g=a.f*sp0;if(g<13||a.x<-20||a.x>W+20||a.y<-20||a.y>H+20)return;const r=A.ps[a.pi].R[a.k],t=(AA[r.n]||"X")+(g>34?r.i:"");ctx.font=`600 ${Math.min(16,g*.8)|0}px system-ui,sans-serif`;ctx.strokeText(t,a.x,a.y);ctx.fillText(t,a.x,a.y)})}}
 function asZ(v){const p=AS.ps[AS.act];if(!p){return}const d=mt(AS.Rc,[0,0,-(v-AS.zp)*.5]);AS.zp=v;for(let k=0;k<3;k++)p.t[k]+=d[k];asDraw();clearTimeout(AS.tm);AS.tm=setTimeout(asRun,150)}
 function asMove(p,dx,dy){const q=mv(AS.Rc,[p.t[0]-AS.cen[0],p.t[1]-AS.cen[1],p.t[2]-AS.cen[2]]),f=AS.D/(AS.D+q[2]),d=mt(AS.Rc,[dx/(AS.sc*f),-dy/(AS.sc*f),0]);for(let k=0;k<3;k++)p.t[k]+=d[k]}
 function asRot(p,dx,dy){p.M=mm(rod(mt(AS.Rc,[1,0,0]),-dy*.01),mm(rod(mt(AS.Rc,[0,1,0]),-dx*.01),p.M))}
-(function(){const cv=$("asc"),P=new Map();let ld=0;
+function asNear(x,y,R){let bd=R*R,b=null;AS.pts.forEach(a=>{const d=(a.x-x)**2+(a.y-y)**2;if(d<bd||(d==bd&&b&&a.z<b.z)){bd=d;b=a}});return b}
+function asPick(x,y){const b=asNear(x,y,20);if(!b)return;const k=b.pi*1e5+b.k;AS.sel.has(k)?AS.sel.delete(k):AS.sel.add(k);asInfo();asDraw()}
+(function(){const cv=$("asc"),P=new Map();let ld=0,dn=null,mv0=0,mu=false;
  cv.onpointerdown=e=>{try{cv.setPointerCapture(e.pointerId)}catch(x){}P.set(e.pointerId,[e.offsetX,e.offsetY]);AS.drag=null;
-  if(P.size==2){const [a,b]=[...P.values()];ld=Math.hypot(a[0]-b[0],a[1]-b[1]);return}
-  if(AS.mode!=="v"){let bd=900,b=null;AS.pts.forEach(a=>{const d=(a.x-e.offsetX)**2+(a.y-e.offsetY)**2;if(d<bd||(d==bd&&b&&a.z<b.z)){bd=d;b=a}});if(b){AS.drag=b.pi;AS.act=b.pi;AS.zp=0;$("asz").value=0;asList()}}};
- cv.onpointermove=e=>{if(!P.has(e.pointerId))return;const o=P.get(e.pointerId),dx=e.offsetX-o[0],dy=e.offsetY-o[1];P.set(e.pointerId,[e.offsetX,e.offsetY]);
-  if(P.size==2){const [a,b]=[...P.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(ld)AS.sc*=d/ld;ld=d;asDraw();return}
+  if(P.size==1){dn=[e.offsetX,e.offsetY];mv0=0;mu=false}else{mu=true}
+  if(P.size==2){const[a,b]=[...P.values()];ld=Math.hypot(a[0]-b[0],a[1]-b[1]);return}
+  if(AS.mode==="m"||AS.mode==="r"){const b=asNear(e.offsetX,e.offsetY,30);if(b){AS.drag=b.pi;AS.act=b.pi;AS.zp=0;$("asz").value=0;asList()}}};
+ cv.onpointermove=e=>{if(!P.has(e.pointerId))return;const o=P.get(e.pointerId),dx=e.offsetX-o[0],dy=e.offsetY-o[1];P.set(e.pointerId,[e.offsetX,e.offsetY]);mv0+=Math.abs(dx)+Math.abs(dy);
+  if(P.size==2){const[a,b]=[...P.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(ld)AS.sc=Math.min(400,Math.max(.3,AS.sc*d/ld));ld=d;asDraw();return}
   const p=AS.drag!=null?AS.ps[AS.drag]:null;if(p&&AS.mode==="m")asMove(p,dx,dy);else if(p)asRot(p,dx,dy);else AS.Rc=mm(rod([1,0,0],-dy*.01),mm(rod([0,1,0],-dx*.01),AS.Rc));asDraw()};
- cv.onpointerup=cv.onpointercancel=e=>{P.delete(e.pointerId);ld=0;if(AS.drag!=null){AS.drag=null;asRun()}};
- cv.onwheel=e=>{e.preventDefault();AS.sc*=e.deltaY<0?1.1:.9;asDraw()}})();
+ cv.onpointerup=cv.onpointercancel=e=>{P.delete(e.pointerId);ld=0;if(AS.mode==="s"&&dn&&!mu&&mv0<6&&P.size==0)asPick(dn[0],dn[1]);if(!P.size)dn=null;if(AS.drag!=null){AS.drag=null;asRun()}};
+ cv.onwheel=e=>{e.preventDefault();AS.sc=Math.min(400,Math.max(.3,AS.sc*(e.deltaY<0?1.1:.9)));asDraw()}})();
+(function(){const f=()=>{list();if(DESK()&&LD!=null)det(LD);if(va.style.display!=="none")asDraw()};MQ.addEventListener?MQ.addEventListener("change",f):MQ.addListener&&MQ.addListener(f);addEventListener("resize",()=>{if(va.style.display!=="none")asDraw()})})();
 const POS=new Set(["ARG","LYS"]),NEG=new Set(["ASP","GLU"]),HYD=new Set(["ALA","VAL","LEU","ILE","MET","PHE","TRP","PRO","CYS"]),POL=new Set(["SER","THR","ASN","GLN","HIS","TYR","GLY"]),CH=u=>POS.has(u)||NEG.has(u);
 function asCls(a,b,d,pp,pl){const like=(POS.has(a)&&POS.has(b))||(NEG.has(a)&&NEG.has(b)),opp=(POS.has(a)&&NEG.has(b))||(NEG.has(a)&&POS.has(b)),hh=HYD.has(a)&&HYD.has(b),hp=(CH(a)||POL.has(a))&&(CH(b)||POL.has(b)),bad=(HYD.has(a)&&CH(b))||(HYD.has(b)&&CH(a));
  if(d<(pp?2.4:3))return 3;if(like&&d<6)return 3;const good=opp||hh||(hp&&pp&&!like);
  if(d<=4.5)return good?1:2;if(d<=8)return(good||pl<70)?2:0;return 0}
 const mg=(o,n)=>o==3||n==3?3:o==1||n==1?1:Math.max(o,n);
 function asRun(){const ps=AS.ps;ps.forEach(p=>{p.st=new Uint8Array(p.R.length);p.ct=[]});
- if(ps.length<2){$("ass").innerHTML="";asDraw();return}
+ if(ps.length<2){$("ass").innerHTML="";asInfo();asDraw();return}
  const W=ps.map(p=>{const X=[],RI=[],EL=[],G=new Map(),key=(x,y,z)=>(Math.floor(x/8)+512)*1048576+(Math.floor(y/8)+512)*1024+Math.floor(z/8)+512;
   p.R.forEach((r,ri)=>r.a.forEach((a,k)=>{const w=wd(p,a),n=RI.length;X.push(w[0],w[1],w[2]);RI.push(ri);EL.push(r.e[k]);const q=key(w[0],w[1],w[2]);(G.get(q)||G.set(q,[]).get(q)).push(n)}));return{X,RI,EL,G,key}});
  const pairs=[];
@@ -249,5 +298,5 @@ function asRun(){const ps=AS.ps;ps.forEach(p=>{p.st=new Uint8Array(p.R.length);p
    if(c){ps[a].st[ri]=mg(ps[a].st[ri],c);if(c==1)ps[a].ct.push({ri,b,rj:B.RI[bj[ri]],d:bd[ri]})}})}
  const n=[0,0,0,0];ps.forEach(p=>p.st.forEach(s=>n[s]++));const t=n[1]+n[2]+n[3],seen=new Set(),L=[];
  ps.forEach((p,a)=>p.ct.sort((u,v)=>u.d-v.d).forEach(c=>{const q=ps[c.b],k=[a+":"+c.ri,c.b+":"+c.rj].sort().join("|");if(seen.has(k))return;seen.add(k);L.push(`${p.R[c.ri].n}${p.R[c.ri].i} (${esc(p.g)}) ↔ ${q.R[c.rj].n}${q.R[c.rj].i} (${esc(q.g)}) · ${c.d.toFixed(1)} Å`)}));
- $("ass").innerHTML=`<div class="card"><b>Interfaccia</b>: ${t} residui<br><span style="color:#22b14c">●</span> ${n[1]} verdi · <span style="color:#f2c200">●</span> ${n[2]} gialli · <span style="color:#e0301e">●</span> ${n[3]} rossi<br>${t?`Indice di incastro: <b>${Math.round(n[1]/t*100)}%</b> (verdi sul totale dei residui all’interfaccia)`:"Le proteine sono troppo lontane: avvicinale."}${L.length?`<h2>Contatti compatibili più vicini</h2><div style="font-size:13px">${L.slice(0,8).join("<br>")}</div>`:""}</div>`;asDraw()}
+ $("ass").innerHTML=`<div class="card"><b>Interfaccia</b>: ${t} residui<br><span style="color:#22b14c">●</span> ${n[1]} verdi · <span style="color:#f2c200">●</span> ${n[2]} gialli · <span style="color:#e0301e">●</span> ${n[3]} rossi<br>${t?`Indice di incastro: <b>${Math.round(n[1]/t*100)}%</b> (verdi sul totale dei residui all’interfaccia)`:"Le proteine sono troppo lontane: avvicinale."}${L.length?`<h2>Contatti compatibili più vicini</h2><div style="font-size:13px">${L.slice(0,8).join("<br>")}</div>`:""}</div>`;asInfo();asDraw()}
 </script><script>if("serviceWorker"in navigator&&/^https?:/.test(location.protocol))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script></body></html>
