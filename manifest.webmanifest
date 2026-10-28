@@ -1,0 +1,32 @@
+{
+ "id": "./proteine-biogrid.html",
+ "name": "Calcolatore di proteine umane",
+ "short_name": "Proteine",
+ "description": "Esplora proteine umane: funzione, interazioni, vie biologiche e strutture AlphaFold.",
+ "lang": "it",
+ "start_url": "./proteine-biogrid.html",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#fafaf7",
+ "theme_color": "#0f6e56",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
