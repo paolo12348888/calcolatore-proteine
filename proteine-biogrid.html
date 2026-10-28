@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0f6e56"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <title>Calcolatore di proteine umane</title>
 <style>
 :root{--bg:#fafaf7;--fg:#1d1d1b;--mut:#6b6b66;--card:#fff;--bd:#e2e2dc;--ac:#0f6e56;--ac2:#e1f5ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -245,4 +246,4 @@ function asRun(){const ps=AS.ps;ps.forEach(p=>{p.st=new Uint8Array(p.R.length);p
  const n=[0,0,0,0];ps.forEach(p=>p.st.forEach(s=>n[s]++));const t=n[1]+n[2]+n[3],seen=new Set(),L=[];
  ps.forEach((p,a)=>p.ct.sort((u,v)=>u.d-v.d).forEach(c=>{const q=ps[c.b],k=[a+":"+c.ri,c.b+":"+c.rj].sort().join("|");if(seen.has(k))return;seen.add(k);L.push(`${p.R[c.ri].n}${p.R[c.ri].i} (${esc(p.g)}) ↔ ${q.R[c.rj].n}${q.R[c.rj].i} (${esc(q.g)}) · ${c.d.toFixed(1)} Å`)}));
  $("ass").innerHTML=`<div class="card"><b>Interfaccia</b>: ${t} residui<br><span style="color:#22b14c">●</span> ${n[1]} verdi · <span style="color:#f2c200">●</span> ${n[2]} gialli · <span style="color:#e0301e">●</span> ${n[3]} rossi<br>${t?`Indice di incastro: <b>${Math.round(n[1]/t*100)}%</b> (verdi sul totale dei residui all’interfaccia)`:"Le proteine sono troppo lontane: avvicinale."}${L.length?`<h2>Contatti compatibili più vicini</h2><div style="font-size:13px">${L.slice(0,8).join("<br>")}</div>`:""}</div>`;asDraw()}
-</script></body></html>
+</script><script>if("serviceWorker"in navigator&&/^https?:/.test(location.protocol))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script></body></html>
