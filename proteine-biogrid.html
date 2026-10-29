@@ -204,7 +204,7 @@ function det(i){tab(0);LD=i;const x=D[i],n=x[11],ph=!DESK(),t=ph?$("out"):$("dt"
 var va=document.createElement("div");va.id="va";va.style.display="none";
 va.innerHTML=`<div class="aL"><p class="s">Scegli fino a 3 proteine (modelli AlphaFold), spostale e ruotale: i residui all’interfaccia si colorano in base all’incastro.</p><input id="asq" placeholder="Gene (es. TP53)" autocapitalize="none"><button class="bt" onclick="asAdd()">Aggiungi</button><div id="asl"></div><div id="asmo"></div><canvas id="asc" style="width:100%;height:340px;border:1px solid var(--bd);border-radius:10px;touch-action:none;background:var(--card)"></canvas><label class="s" style="display:block">Avvicina / allontana la proteina attiva <input type="range" id="asz" min="-100" max="100" value="0" style="padding:0" oninput="asZ(+this.value)"></label><div id="asm" class="note"></div></div><div class="aR"><div id="ass"></div><div id="asi"></div><div class="note"><span style="color:#22b14c">●</span> verde: incastro compatibile · <span style="color:#f2c200">●</span> giallo: potrebbe interagire con un cambio conformazionale · <span style="color:#e0301e">●</span> rosso: scontro tra atomi o cariche uguali vicine. Euristica geometrica e chimica su corpi rigidi: non è un docking né una predizione di legame.<br>Zoomando compaiono le lettere degli amminoacidi. Catene laterali: carbonio nel colore del residuo, N blu, O grigio scuro, S viola.</div></div>`;
 document.querySelector("#anc").before(va);
-var AS={ps:[],act:-1,mode:"v",sty:"c",Rc:[1,0,0,0,1,0,0,0,1],sc:4,D:300,cen:[0,0,0],pts:[],drag:null,zp:0,sel:new Set()};
+var AS={ps:[],act:-1,mode:"v",sty:"c",Rc:[1,0,0,0,1,0,0,0,1],sc:4,D:300,cen:[0,0,0],pts:[],drag:null,zp:0,sel:new Set(),rnd:null,busy:0,stop:0,optN:1500};
 const COL=["#5b8bd6","#9a7bd0","#4fa6a0"],ST=["","#22b14c","#f2c200","#e0301e"],EC={N:"#2f6fe0",O:"#3a3a3a",S:"#8e44ad"},VR={C:1.7,N:1.55,O:1.52,S:1.8};
 const AA={ALA:"A",ARG:"R",ASN:"N",ASP:"D",CYS:"C",GLN:"Q",GLU:"E",GLY:"G",HIS:"H",ILE:"I",LEU:"L",LYS:"K",MET:"M",PHE:"F",PRO:"P",SER:"S",THR:"T",TRP:"W",TYR:"Y",VAL:"V"};
 const mv=(M,p)=>[M[0]*p[0]+M[1]*p[1]+M[2]*p[2],M[3]*p[0]+M[4]*p[1]+M[5]*p[2],M[6]*p[0]+M[7]*p[1]+M[8]*p[2]];
@@ -235,7 +235,7 @@ async function asAdd(i){tab(3);if(i===undefined)i=gi($("asq").value);const m=$("
 function asDel(k){AS.ps.splice(k,1);AS.sel.clear();AS.act=AS.ps.length-1;asList();asFit();asRun()}
 function asList(){const b=(m,t,o)=>`<button class="tb${o?" on":""}" onclick="${m}">${t}</button>`;
  $("asl").innerHTML=AS.ps.map((p,k)=>`<span class="kw" style="cursor:pointer;border-color:${p.col};${k==AS.act?"font-weight:600":""}" onclick="AS.act=${k};asList()">${esc(p.g)} · ${p.R.length} aa <b onclick="event.stopPropagation();asDel(${k})">✕</b></span>`).join("");
- $("asmo").innerHTML=[["v","Vista"],["m","Sposta"],["r","Ruota"],["s","Seleziona"]].map(([m,t])=>b(`AS.mode='${m}';asList()`,t,AS.mode==m)).join("")+"<br>"+[["c","Semplificato"],["n","Nastro (stile AlphaFold)"],["f","Spacefilling"]].map(([m,t])=>b(`AS.sty='${m}';asList();asDraw()`,t,AS.sty==m)).join("")+"<br>"+b("asSelI()","Seleziona interfaccia")+b("AS.sel.clear();asInfo();asDraw()","Cancella selezione")}
+ $("asmo").innerHTML=[["v","Vista"],["m","Sposta"],["r","Ruota"],["s","Seleziona"]].map(([m,t])=>b(`AS.mode='${m}';asList()`,t,AS.mode==m)).join("")+"<br>"+[["c","Semplificato"],["n","Nastro (stile AlphaFold)"],["f","Spacefilling"]].map(([m,t])=>b(`AS.sty='${m}';asList();asDraw()`,t,AS.sty==m)).join("")+"<br>"+b("asSelI()","Seleziona interfaccia")+b("AS.sel.clear();asInfo();asDraw()","Cancella selezione")+b("asOpt()","Ottimizza posa")}
 function asInfo(){const L=[...AS.sel].map(k=>{const pi=Math.floor(k/1e5),ri=k%1e5,p=AS.ps[pi];if(!p||!p.R[ri])return"";const r=p.R[ri],s=p.st[ri];return`<div style="font-size:13px"><span style="color:${s?ST[s]:"var(--mut)"}">●</span> ${r.n} ${r.i} (${AA[r.n]||"?"}) · ${esc(p.g)}${s?" · "+["","verde","giallo","rosso"][s]:""} · pLDDT ${r.pl.toFixed(0)}</div>`}).filter(Boolean);$("asi").innerHTML=L.length?`<div class="card"><h2 style="margin-top:0">Residui selezionati (${L.length})</h2>${L.slice(0,30).join("")}${L.length>30?"…":""}</div>`:""}
 function asSelI(){AS.sel.clear();let c=0;AS.ps.forEach((p,pi)=>p.st.forEach((s,ri)=>{if(s&&c<80){AS.sel.add(pi*1e5+ri);c++}}));asInfo();asDraw()}
 function asFit(){const ps=AS.ps,cv=$("asc");if(!ps.length)return;const c=[0,0,0];ps.forEach(p=>{for(let k=0;k<3;k++)c[k]+=p.t[k]/ps.length});AS.cen=c;
@@ -285,8 +285,8 @@ function asCls(a,b,d,pp,pl){const like=(POS.has(a)&&POS.has(b))||(NEG.has(a)&&NE
  if(d<(pp?2.4:3))return 3;if(like&&d<6)return 3;const good=opp||hh||(hp&&pp&&!like);
  if(d<=4.5)return good?1:2;if(d<=8)return(good||pl<70)?2:0;return 0}
 const mg=(o,n)=>o==3||n==3?3:o==1||n==1?1:Math.max(o,n);
-function asRun(){const ps=AS.ps;ps.forEach(p=>{p.st=new Uint8Array(p.R.length);p.ct=[]});
- if(ps.length<2){$("ass").innerHTML="";asInfo();asDraw();return}
+function asCore(){const ps=AS.ps;ps.forEach(p=>{p.st=new Uint8Array(p.R.length);p.ct=[]});
+ if(ps.length<2)return false;
  const W=ps.map(p=>{const X=[],RI=[],EL=[],G=new Map(),key=(x,y,z)=>(Math.floor(x/8)+512)*1048576+(Math.floor(y/8)+512)*1024+Math.floor(z/8)+512;
   p.R.forEach((r,ri)=>r.a.forEach((a,k)=>{const w=wd(p,a),n=RI.length;X.push(w[0],w[1],w[2]);RI.push(ri);EL.push(r.e[k]);const q=key(w[0],w[1],w[2]);(G.get(q)||G.set(q,[]).get(q)).push(n)}));return{X,RI,EL,G,key}});
  const pairs=[];
@@ -296,7 +296,23 @@ function asRun(){const ps=AS.ps;ps.forEach(p=>{p.st=new Uint8Array(p.R.length);p
     for(const j of c){const d=Math.hypot(x-B.X[j*3],y-B.X[j*3+1],z-B.X[j*3+2]),ri=A.RI[i];if(d<bd[ri]){bd[ri]=d;bi[ri]=i;bj[ri]=j}}}}
   ps[a].R.forEach((r,ri)=>{if(bd[ri]>8)return;const q=ps[b].R[B.RI[bj[ri]]],pp="NO".includes(A.EL[bi[ri]])&&"NO".includes(B.EL[bj[ri]]),c=asCls(r.n,q.n,bd[ri],pp,Math.min(r.pl,q.pl));
    if(c){ps[a].st[ri]=mg(ps[a].st[ri],c);if(c==1)ps[a].ct.push({ri,b,rj:B.RI[bj[ri]],d:bd[ri]})}})}
+ return true}
+function asRun(){const ps=AS.ps;if(!asCore()){$("ass").innerHTML="";asInfo();asDraw();return}
  const n=[0,0,0,0];ps.forEach(p=>p.st.forEach(s=>n[s]++));const t=n[1]+n[2]+n[3],seen=new Set(),L=[];
  ps.forEach((p,a)=>p.ct.sort((u,v)=>u.d-v.d).forEach(c=>{const q=ps[c.b],k=[a+":"+c.ri,c.b+":"+c.rj].sort().join("|");if(seen.has(k))return;seen.add(k);L.push(`${p.R[c.ri].n}${p.R[c.ri].i} (${esc(p.g)}) ↔ ${q.R[c.rj].n}${q.R[c.rj].i} (${esc(q.g)}) · ${c.d.toFixed(1)} Å`)}));
  $("ass").innerHTML=`<div class="card"><b>Interfaccia</b>: ${t} residui<br><span style="color:#22b14c">●</span> ${n[1]} verdi · <span style="color:#f2c200">●</span> ${n[2]} gialli · <span style="color:#e0301e">●</span> ${n[3]} rossi<br>${t?`Indice di incastro: <b>${Math.round(n[1]/t*100)}%</b> (verdi sul totale dei residui all’interfaccia)`:"Le proteine sono troppo lontane: avvicinale."}${L.length?`<h2>Contatti compatibili più vicini</h2><div style="font-size:13px">${L.slice(0,8).join("<br>")}</div>`:""}</div>`;asInfo();asDraw()}
+const rg=()=>{const r=AS.rnd||Math.random;return Math.sqrt(-2*Math.log(r()+1e-12))*Math.cos(6.2832*r())},ru=()=>{const v=[rg(),rg(),rg()],n=Math.hypot(...v)||1;return v.map(a=>a/n)};
+const gk=(x,y,z)=>(Math.floor(x/6)+512)*1048576+(Math.floor(y/6)+512)*1024+Math.floor(z/6)+512;
+function asEn(o,M,t){let c=0,pen=0;const X=o.X,E=o.XE;for(let i=0;i<o.A.length;i++){const q=mv(M,o.A[i]),x=q[0]+t[0],y=q[1]+t[1],z=q[2]+t[2],cx=Math.floor(x/6),cy=Math.floor(y/6),cz=Math.floor(z/6),ea=o.AE[i],pa=ea==="N"||ea==="O";
+  for(let u=-1;u<2;u++)for(let v=-1;v<2;v++)for(let w=-1;w<2;w++){const L=o.G.get((cx+u+512)*1048576+(cy+v+512)*1024+cz+w+512);if(!L)continue;for(const j of L){const dx=x-X[j*3],dy=y-X[j*3+1],dz=z-X[j*3+2],d2=dx*dx+dy*dy+dz*dz;if(d2>=25)continue;const d=Math.sqrt(d2),th=pa&&(E[j]==="N"||E[j]==="O")?2.5:3.2;if(d<th)pen+=(th-d)*(th-d);else c++}}}
+ return c-30*pen}
+function asOptInit(){const p=AS.ps[AS.act];if(!p||AS.ps.length<2)return null;const G=new Map(),X=[],XE=[];
+ AS.ps.forEach((q,k)=>{if(k!=AS.act)q.R.forEach(r=>r.a.forEach((a,m)=>{const w=wd(q,a),n=XE.length;X.push(w[0],w[1],w[2]);XE.push(r.e[m]);const key=gk(w[0],w[1],w[2]);(G.get(key)||G.set(key,[]).get(key)).push(n)}))});
+ const A=[],AE=[];p.R.forEach(r=>r.a.forEach((a,m)=>{A.push(a);AE.push(r.e[m])}));const o={p,G,X,XE,A,AE,it:0,N:AS.optN};o.cur={M:p.M,t:p.t.slice(),s:asEn(o,p.M,p.t)};o.best={...o.cur,t:o.cur.t.slice()};o.s0=o.cur.s;return o}
+function asOptStep(o,k){const p=o.p;for(let j=0;j<k&&o.it<o.N;j++,o.it++){const f=1-o.it/o.N,sr=(.5+3.5*f)*Math.PI/180,st=.2+1.3*f,T=.3+5*f,M2=mm(rod(ru(),rg()*sr),o.cur.M),t2=o.cur.t.map(v=>v+rg()*st),s=asEn(o,M2,t2);
+  if(s>=o.cur.s||(AS.rnd||Math.random)()<Math.exp((s-o.cur.s)/T)){o.cur={M:M2,t:t2,s};if(s>o.best.s)o.best={M:M2,t:t2.slice(),s}}}
+ p.M=o.best.M;p.t=o.best.t.slice()}
+function asOpt(){const m=$("asm");if(AS.busy){AS.stop=1;return}const o=asOptInit();if(!o){m.textContent="Servono almeno due proteine.";return}AS.busy=1;AS.stop=0;
+ (function tick(){if(AS.stop||o.it>=o.N){AS.busy=0;o.p.M=o.best.M;o.p.t=o.best.t.slice();asRun();m.textContent="Ottimizzazione finita: punteggio di contatto "+Math.round(o.s0)+" → "+Math.round(o.best.s)+". Affinamento locale che massimizza i contatti evitando scontri: non garantisce la posa reale.";asList();return}
+  asOptStep(o,25);m.textContent="Ottimizzo… "+Math.round(o.it/o.N*100)+"% (tocca di nuovo Ottimizza per fermare)";asDraw();setTimeout(tick,0)})()}
 </script><script>if("serviceWorker"in navigator&&/^https?:/.test(location.protocol))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script></body></html>
